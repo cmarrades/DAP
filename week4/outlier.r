@@ -11,7 +11,7 @@ athletes <- read.table('/home/epa/DAP/athletes.txt', header=", sep =',')
 wpolo <- athlete[athletes$Sport=="w_polo",]
 wpolo_men <- wpolo[wpolo$Sex==0,]
 
-wpolo <- athletes[athletes$Sport=="w_polo" & atj;etes&Sex=="0",]
+wpolo <- athletes[athletes$Sport=="w_polo" & athletes&Sex=="0",]
 
 print (summary(wpolo))
 #subset(athletes, Sex==0 & Sport=="w_polo")
