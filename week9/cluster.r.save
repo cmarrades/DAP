@@ -1,18 +1,23 @@
 #function can bee seen by ald nodes in the fork cluster
 
+library(parallel)
 test <- function(i){
-  print(sqrt(i))
+sqrt(i)
 }
 
 #make a fork cluster with 4 nodes
 #clu <- makeCluster(type="FORK",2)
-cluType <- "FORK"
+
+#clu <- makeCluster(type="PSOCK",2)
+
+#parSapply(clu, c(100, 200,300,400), test)
 
 
-clu <-  makeCluster(2, outfile = "")
+clu <- makeCluster(type="PSOCK",2)
+
 
 parSapply(clu, c(100, 200), test)
-#sapply(c(100,200),test)
+sapply(c(100,200),test)
 
 stopCluster(clu)
 
