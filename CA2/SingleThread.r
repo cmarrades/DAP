@@ -4,28 +4,19 @@
 library(RSQLite)
 
 
-#define funcs
-getNumberOfDays <- function(){
- args = commandArgs(trailingOnly = 0)
- print(args)
-}
-
-
 #Define global vars
-days <- 5 
+days <- 3
 args = commandArgs(trailingOnly = TRUE)
-if (length(args) != 0)
+if (length(args) == 1)
 {
-  print("1 arg")
+  print("days provided")
   days <- args[1]
 }
 stockNames <- c("AAPL","GOOG","ORCL","INTC","SYMC","FB","CSCO","XRX","IBM","MSFT")
 
 #1. calculate stocks average for N days...
 conSQLite <- dbConnect(RSQLite::SQLite(), dbname="stocks.sqlite")
-today <-  dbGetQuery(conSQLite, "SELECT MAX(Day) FROM stock_gains")
-fromDay <- today-days
-avgQuery <- sprintf("SELECT AVG(gain) FROM stock_gains WHERE day >= -%s", fromDay)
+avgQuery <- sprintf("SELECT AVG(gain) FROM stock_gains WHERE day <= %s", days)
 #avgSql <- dbSendQuery(conSQLite, avgQuery)
 #stocksAvg <- fetch(avgSql)
 stocksAvgGain  <- dbGetQuery(conSQLite, avgQuery)
@@ -33,10 +24,10 @@ stocksAvgGain  <- dbGetQuery(conSQLite, avgQuery)
 print(sprintf("average gains for %s days is %s", days, stocksAvgGain))
 
 #Function to calculate Stock Average
-getStockAvgFunc <- function(stockName, fromDay, positiveFunc){
-  stockQuery <- sprintf("SELECT AVG(gain) from stock_gains where day >= %s AND stock='%s'", fromDay, stockName)
+getStockAvgFunc <- function(stockName, days, positiveFunc){
+  stockQuery <- sprintf("SELECT AVG(gain) from stock_gains where day <= %s AND stock='%s'", days, stockName)
   stockAvgGain <- dbGetQuery(conSQLite, stockQuery)
-  print(sprintf("Average gain for stock %s in %s days is %s", stockName, days, stockAvgGain))
+  #print(sprintf("Average gain for stock %s in %s days is %s", stockName, days, stockAvgGain))
   return(positiveFunc(stockName, stockAvgGain))
 }
 
@@ -57,7 +48,7 @@ printResultsPipe <- function(stockName){
 
 #2. iterate each stockIndex and get 
 for (stockName in stockNames){
-  result = getStockAvgFunc(stockName, fromDay, manageStockGainFunc) 
+  result = getStockAvgFunc(stockName, days, manageStockGainFunc) 
   printResultsPipe(result)
 }
 
